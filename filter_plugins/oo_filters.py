@@ -1021,13 +1021,16 @@ def oo_pods_match_component(pods, deployment_type, component):
         raise errors.AnsibleFilterError("failed expects deployment_type to be a string")
     if not isinstance(component, string_types):
         raise errors.AnsibleFilterError("failed expects component to be a string")
-
+     
     image_prefix = 'openshift/origin-'
     if deployment_type == 'openshift-enterprise':
         image_prefix = 'openshift3/ose-'
 
     matching_pods = []
-    image_regex = image_prefix + component + r'.*'
+    #Hack: Remove image regex for upgrade
+    #image_regex = image_prefix + component + r'.*'
+
+    image_regex = component + r'.*'
     for pod in pods:
         for container in pod['spec']['containers']:
             if re.search(image_regex, container['image']):
