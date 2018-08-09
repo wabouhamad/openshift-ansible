@@ -15,6 +15,22 @@
   when: openshift_node_dnsmasq_additional_config_file is defined
   notify: restart dnsmasq
 
+- name: Create override dnsmasq systemd unit directory
+  file:
+    path: /etc/systemd/system/dnsmasq.service.d
+    state: directory
+
+- name: Copy systemd dnsmasq unit override file
+  copy:
+    src: override.conf
+    dest: /etc/systemd/system/dnsmasq.service.d/override.conf
+
+- name: Restart dnsmasq service and reload configuration
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: dnsmasq
+
 - name: Enable dnsmasq
   systemd:
     name: dnsmasq
