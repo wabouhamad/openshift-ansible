@@ -18,6 +18,25 @@
   until: result is succeeded
   when: not openshift_is_atomic | bool
 
+- name: Create override dnsmasq systemd unit directory
+  file:
+    path: /etc/systemd/system/dnsmasq.service.d
+    state: directory
+  when: not openshift_is_atomic | bool
+
+- name: Copy systemd dnsmasq unit override file
+  copy:
+    src: config/override.conf
+    dest: /etc/systemd/system/dnsmasq.service.d/override.conf
+  when: not openshift_is_atomic | bool
+
+- name: Restart dnsmasq service and reload configuration
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: dnsmasq
+  when: not openshift_is_atomic | bool
+
 - name: ensure origin/node directory exists
   file:
     state: directory
